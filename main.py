@@ -7,11 +7,15 @@ from conductor.client.orkes_clients import OrkesClients
 from conductor.client.http.models import TaskDef
 from workflow import new_user_onboarding_workflow
 from workflow_input import WorkflowInput
-#from task_definitions import get_task_definitions
+from dotenv import load_dotenv
+import os
 
-SERVER_URL = 'https://adrian-demo.orkesconductor.io/api'
-KEY = 'a735202c-c1c1-11f0-bca6-2ece4f2789ea'	
-SECRET = '5HcN3owzY5kiqCQ7BPzrGKbUveO3RMTTRbLt5iOstOgaw871' 
+load_dotenv()
+
+SERVER_URL = os.getenv("SERVER_URL")
+KEY = os.getenv("KEY")
+SECRET = os.getenv("SECRET")
+
 
 def register_workflow(workflow_executor: WorkflowExecutor) -> ConductorWorkflow:
     workflow = new_user_onboarding_workflow(workflow_executor=workflow_executor)
