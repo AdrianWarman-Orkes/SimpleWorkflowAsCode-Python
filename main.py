@@ -7,7 +7,7 @@ from conductor.client.orkes_clients import OrkesClients
 from conductor.client.http.models import TaskDef
 from workflow import new_user_onboarding_workflow
 from workflow_input import WorkflowInput
-from task_definitions import get_task_definitions
+#from task_definitions import get_task_definitions
 
 SERVER_URL = 'https://adrian-demo.orkesconductor.io/api'
 KEY = 'a735202c-c1c1-11f0-bca6-2ece4f2789ea'	
@@ -17,6 +17,17 @@ def register_workflow(workflow_executor: WorkflowExecutor) -> ConductorWorkflow:
     workflow = new_user_onboarding_workflow(workflow_executor=workflow_executor)
     workflow.register(True)
     return workflow
+
+def get_task_definition():
+    
+    task_def = TaskDef()
+    task_def.name = 'insertUserData_1'
+    task_def.retry_count = 3,
+    task_def.retry_logic = 'FIXED'
+    task_def.retry_delay_seconds = 60
+    
+    return task_def
+
 
 
 def main():
@@ -31,6 +42,12 @@ def main():
 
     workflow_executor = WorkflowExecutor(configuration=api_config)
 
+    clients = OrkesClients(configuration=api_config)
+
+    metadata_client = clients.get_metadata_client()
+
+    metadata_client.register_task_def(task_def=get_task_definition())
+
     workflow = register_workflow(workflow_executor)
 
     task_handler = TaskHandler(configuration=api_config)
@@ -43,7 +60,7 @@ def main():
         workflow_input=input_data.to_dict()
     )
 
-    print(f'\nworkflow result: {workflow_run.output}\n')
+    print(f'\nworkflow result: {workflow_run.output["result"]}\n')
     print(f'see the workflow execution here: {api_config.ui_host}/execution/{workflow_run.workflow_id}\n')
 
     #task_handler.stop_processes()
